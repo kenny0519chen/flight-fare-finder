@@ -90,16 +90,20 @@ Routes are defined in `src/router.tsx`; pages live in `src/pages/`.
 
 ### Environment variables
 
-Vite inlines these at build time (see `.env`):
+Auth runs on our own Supabase project (`kounudhhosybfouiktff`). Vite inlines
+these at build time from `.env` (local) or the Vercel project settings:
 
-- `VITE_SUPABASE_URL`
-- `VITE_SUPABASE_PUBLISHABLE_KEY`
+- `VITE_SUPABASE_URL` — `https://kounudhhosybfouiktff.supabase.co`
+- `VITE_SUPABASE_PUBLISHABLE_KEY` — the project's `sb_publishable_…` key
+  (browser-safe, RLS-gated; replaces the legacy "anon" key)
+
+The only Supabase client is `src/integrations/supabase/client.ts`.
 
 ## Deploying to Vercel
 
 Import the repo in Vercel; `vercel.json` already sets the Vite framework,
 `bun run build`, the `dist` output directory, and a SPA fallback rewrite so
 deep links like `/app` load `index.html` and resolve client-side. Add the two
-`VITE_*` variables above under Project → Settings → Environment Variables if
-you stop committing `.env`, and add your Vercel domain to the Supabase Auth
-redirect URLs.
+`VITE_*` variables above under Project → Settings → Environment Variables
+(Production, Preview and Development), and add your Vercel domain to Supabase
+→ Authentication → URL Configuration (Site URL / Redirect URLs).
