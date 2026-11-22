@@ -1,38 +1,36 @@
-import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
+import { useNavigate, Link } from "react-router";
 import { useEffect, useState, type FormEvent } from "react";
 import { Plane, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
+import { usePageMeta } from "@/hooks/use-page-meta";
 
-export const Route = createFileRoute("/auth")({
-  head: () => ({
-    meta: [
-      { title: "Sign in — Flight Price Notifier" },
-      { name: "description", content: "Sign in to manage your fare alerts." },
-      { property: "og:title", content: "Sign in — Flight Price Notifier" },
-      { property: "og:description", content: "Sign in to manage your fare alerts." },
-    ],
-  }),
-  component: AuthPage,
-});
+type AuthMode = "signin" | "signup";
 
-function AuthPage() {
+/** Rendered at /sign-in (mode="signin") and /sign-up (mode="signup"). */
+export default function AuthPage({ mode }: { mode: AuthMode }) {
   const navigate = useNavigate();
-  const [mode, setMode] = useState<"signin" | "signup">("signin");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState<{ kind: "error" | "info"; text: string } | null>(null);
 
+  usePageMeta(
+    mode === "signin" ? "Sign in — Flight Price Notifier" : "Sign up — Flight Price Notifier",
+    mode === "signin"
+      ? "Sign in to manage your fare alerts."
+      : "Create an account to start tracking fares.",
+  );
+
   // If already signed in, go straight to the dashboard.
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => {
-      if (data.session) navigate({ to: "/dashboard", replace: true });
+      if (data.session) navigate("/app", { replace: true });
     });
     const { data: sub } = supabase.auth.onAuthStateChange((event) => {
-      if (event === "SIGNED_IN") navigate({ to: "/dashboard", replace: true });
+      if (event === "SIGNED_IN") navigate("/app", { replace: true });
     });
     return () => sub.subscription.unsubscribe();
   }, [navigate]);
@@ -47,7 +45,7 @@ function AuthPage() {
       if (error) {
         setMessage({ kind: "error", text: error.message });
       }
-      // Success handled by onAuthStateChange → redirect to /dashboard
+      // Success handled by onAuthStateChange → redirect to /app
     } else {
       const { data, error } = await supabase.auth.signUp({
         email,
@@ -140,8 +138,8 @@ function AuthPage() {
             <button
               type="button"
               onClick={() => {
-                setMode(mode === "signin" ? "signup" : "signin");
                 setMessage(null);
+                navigate(mode === "signin" ? "/sign-up" : "/sign-in");
               }}
               className="mt-6 w-full text-center text-sm text-muted-foreground transition-colors hover:text-primary"
             >

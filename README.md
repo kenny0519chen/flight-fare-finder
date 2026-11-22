@@ -66,11 +66,40 @@ Continue developing this project in the [Lovable editor](https://lovable.dev/pro
 
 ## Development
 
-Prefer working locally? You need Node.js and npm — [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating).
+This is a plain **Vite + React single-page app** (no SSR) using React Router
+for client-side routing. You need [Bun](https://bun.sh) (or Node.js + npm).
 
 ```sh
-git clone <this-repository-url>
-cd <repository-name>
-npm i
-npm run dev
+bun install
+bun run dev        # http://localhost:8080
+bun run build      # static output in dist/
+bun run preview    # serve dist/ locally
 ```
+
+### Routes
+
+| Path | Page |
+| --- | --- |
+| `/` | Landing page |
+| `/sign-in` | Sign in (Supabase email/password) |
+| `/sign-up` | Create account |
+| `/app` | Dashboard — signed-in users only, otherwise redirects to `/sign-in` |
+
+Old URLs `/auth` and `/dashboard` redirect to `/sign-in` and `/app`.
+Routes are defined in `src/router.tsx`; pages live in `src/pages/`.
+
+### Environment variables
+
+Vite inlines these at build time (see `.env`):
+
+- `VITE_SUPABASE_URL`
+- `VITE_SUPABASE_PUBLISHABLE_KEY`
+
+## Deploying to Vercel
+
+Import the repo in Vercel; `vercel.json` already sets the Vite framework,
+`bun run build`, the `dist` output directory, and a SPA fallback rewrite so
+deep links like `/app` load `index.html` and resolve client-side. Add the two
+`VITE_*` variables above under Project → Settings → Environment Variables if
+you stop committing `.env`, and add your Vercel domain to the Supabase Auth
+redirect URLs.

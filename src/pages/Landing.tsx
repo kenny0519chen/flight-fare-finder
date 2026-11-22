@@ -1,28 +1,8 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { Link } from "react-router";
 import { useEffect, useRef, type ReactNode } from "react";
 import { Plane, Bell, XCircle, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
-
-export const Route = createFileRoute("/")({
-  head: () => ({
-    meta: [
-      { title: "Flight Price Notifier — 機票降價通知" },
-      {
-        name: "description",
-        content:
-          "Set a route and a target price — we email you when the fare drops. 設定航線與目標價，機票降價就通知你。",
-      },
-      { property: "og:title", content: "Flight Price Notifier — 機票降價通知" },
-      {
-        property: "og:description",
-        content: "Set a route and a target price — we email you when the fare drops.",
-      },
-      { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary_large_image" },
-    ],
-  }),
-  component: LandingPage,
-});
+import { usePageMeta } from "@/hooks/use-page-meta";
 
 function Reveal({ children, className = "" }: { children: ReactNode; className?: string }) {
   const ref = useRef<HTMLDivElement>(null);
@@ -73,7 +53,12 @@ const FEATURES = [
   },
 ];
 
-function LandingPage() {
+export default function LandingPage() {
+  usePageMeta(
+    "Flight Price Notifier — 機票降價通知",
+    "Set a route and a target price — we email you when the fare drops. 設定航線與目標價，機票降價就通知你。",
+  );
+
   return (
     <div className="flex min-h-screen flex-col bg-background">
       {/* Header */}
@@ -84,7 +69,7 @@ function LandingPage() {
             Flight Price Notifier
           </div>
           <Button asChild size="sm">
-            <Link to="/auth">Sign in / 登入</Link>
+            <Link to="/sign-in">Sign in / 登入</Link>
           </Button>
         </div>
       </header>
@@ -122,7 +107,7 @@ function LandingPage() {
           </p>
           <div className="mt-10 animate-fade-up" style={{ animationDelay: "0.4s" }}>
             <Button asChild size="lg" className="px-8">
-              <Link to="/auth">
+              <Link to="/sign-in">
                 Sign in / 登入
                 <ArrowRight className="ml-2 h-4 w-4" />
               </Link>

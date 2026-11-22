@@ -1,27 +1,20 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { useNavigate, useRouteLoaderData } from "react-router";
 import { Plane, LogOut, Bell } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
+import { usePageMeta } from "@/hooks/use-page-meta";
+import { AUTHENTICATED_ROUTE_ID, type AuthenticatedData } from "@/lib/auth-route";
 
-export const Route = createFileRoute("/_authenticated/dashboard")({
-  head: () => ({
-    meta: [
-      { title: "Dashboard — Flight Price Notifier" },
-      { name: "description", content: "Manage your flight fare alerts." },
-      { property: "og:title", content: "Dashboard — Flight Price Notifier" },
-      { property: "og:description", content: "Manage your flight fare alerts." },
-    ],
-  }),
-  component: DashboardPage,
-});
-
-function DashboardPage() {
-  const { user } = Route.useRouteContext();
+/** Rendered at /app, behind the auth guard in src/router.tsx. */
+export default function DashboardPage() {
+  const { user } = useRouteLoaderData(AUTHENTICATED_ROUTE_ID) as AuthenticatedData;
   const navigate = useNavigate();
+
+  usePageMeta("Dashboard — Flight Price Notifier", "Manage your flight fare alerts.");
 
   async function handleSignOut() {
     await supabase.auth.signOut();
-    navigate({ to: "/", replace: true });
+    navigate("/", { replace: true });
   }
 
   return (
